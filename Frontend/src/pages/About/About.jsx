@@ -175,70 +175,7 @@ const About = () => {
                     </div>
                 </div>
             </section>
-            <section class="py-16 bg-white">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="text-center mb-12">
-                        <h2 class="text-3xl font-bold text-gray-900">
-                            Meet Our Team
-                        </h2>
-                        <p class="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-                            The passionate individuals behind{" "}
-                            <span className="brand_name">ecofinds</span>'s
-                            success
-                        </p>
-                    </div>
-
-                    <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
-                        <div class="text-center">
-                            <img
-                                src="/images/people1.jpg"
-                                alt="Smiling female CEO wearing business casual attire in an orange-themed office"
-                                class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-                            />
-                            <h3 class="text-lg font-semibold text-gray-900">
-                                Karan Salvi
-                            </h3>
-                            <p class="text-primary-600">CEO & Founder</p>
-                        </div>
-
-                        <div class="text-center">
-                            <img
-                                src="/images/people4.jpg"
-                                alt="Female marketing director holding tablet with ecofinds app open"
-                                class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-                            />
-                            <h3 class="text-lg font-semibold text-gray-900">
-                                Vedant Jamodakar
-                            </h3>
-                            <p class="text-primary-600">Co-Founder</p>
-                        </div>
-
-                        <div class="text-center">
-                            <img
-                                src="/images/people2.jpg"
-                                alt="Male tech executive wearing glasses standing against a orange accent wall"
-                                class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-                            />
-                            <h3 class="text-lg font-semibold text-gray-900">
-                                Vishwas Gore
-                            </h3>
-                            <p class="text-primary-600">CTO</p>
-                        </div>
-
-                        <div class="text-center">
-                            <img
-                                src="/images/people3.jpg"
-                                alt="Customer service manager smiling with headset on in modern office setting"
-                                class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
-                            />
-                            <h3 class="text-lg font-semibold text-gray-900">
-                                Kshitij Kadlag
-                            </h3>
-                            <p class="text-primary-600">CFO</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            
             <section class="py-16 bg-gray-50">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="text-center mb-12">
