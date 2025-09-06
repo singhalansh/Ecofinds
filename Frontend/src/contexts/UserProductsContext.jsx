@@ -1,82 +1,123 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './EcommerceContext';
-import { useGetUserProductsQuery, useAddProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '../store/api/authApi';
+import { createContext, useContext } from "react";
+import { useSelector } from "react-redux";
+import {
+    useGetUserProductsQuery,
+    useAddProductMutation,
+    useUpdateProductMutation,
+    useDeleteProductMutation,
+} from "../store/api/userProductsApi";
+import { toast } from "@/components/ui/use-toast";
 
 const UserProductsContext = createContext();
 
 export const UserProductsProvider = ({ children }) => {
-  const { user } = useAuth();
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const { user } = useSelector((state) => state.auth);
 
-  // Fetch user's products
-  const { data: userProducts, refetch } = useGetUserProductsQuery(undefined, {
-    skip: !user?._id,
-  });
-
-  const [addProduct] = useAddProductMutation();
-  const [updateProduct] = useUpdateProductMutation();
-  const [deleteProduct] = useDeleteProductMutation();
-
-  useEffect(() => {
-    if (userProducts) {
-      setProducts(userProducts.products || []);
-      setIsLoading(false);
-    }
-  }, [userProducts]);
-
-  const addNewProduct = async (productData) => {
-    try {
-      const result = await addProduct(productData).unwrap();
-      await refetch();
-      return { success: true, data: result };
-    } catch (error) {
-      return { success: false, error: error.data?.message || 'Failed to add product' };
-    }
-  };
-
-  const editProduct = async ({ id, ...updates }) => {
-    try {
-      const result = await updateProduct({ id, updates }).unwrap();
-      await refetch();
-      return { success: true, data: result };
-    } catch (error) {
-      return { success: false, error: error.data?.message || 'Failed to update product' };
-    }
-  };
-
-  const removeProduct = async (productId) => {
-    try {
-      await deleteProduct(productId).unwrap();
-      await refetch();
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error.data?.message || 'Failed to delete product' };
-    }
-  };
-
-  return (
-    <UserProductsContext.Provider
-      value={{
-        products,
+    // Fetch user's products
+    const {
+        data: userProducts,
         isLoading,
         error,
-        addProduct: addNewProduct,
-        updateProduct: editProduct,
-        deleteProduct: removeProduct,
-        refreshProducts: refetch,
-      }}
-    >
-      {children}
-    </UserProductsContext.Provider>
-  );
+        refetch,
+    } = useGetUserProductsQuery(undefined, {
+        skip: !user?.data?._id,
+    });
+
+    const [addProductMutation] = useAddProductMutation();
+    const [updateProductMutation] = useUpdateProductMutation();
+    const [deleteProductMutation] = useDeleteProductMutation();
+
+    const products = userProducts?.products || [];
+
+    const addProduct = async (productData) => {
+        try {
+            const result = await addProductMutation(productData).unwrap();
+            toast.success({
+                title: "Success",
+                description: "Product added successfully",
+            });
+            await refetch();
+            return { success: true, data: result };
+        } catch (error) {
+            toast.error({
+                title: "Error",
+                description: error.data?.message || "Failed to add product",
+            });
+            return {
+                success: false,
+                error: error.data?.message || "Failed to add product",
+            };
+        }
+    };
+
+    const updateProduct = async ({ id, ...updates }) => {
+        try {
+            const result = await updateProductMutation({
+                id,
+                updates,
+            }).unwrap();
+            toast.success({
+                title: "Success",
+                description: "Product updated successfully",
+            });
+            await refetch();
+            return { success: true, data: result };
+        } catch (error) {
+            toast.error({
+                title: "Error",
+                description: error.data?.message || "Failed to update product",
+            });
+            return {
+                success: false,
+                error: error.data?.message || "Failed to update product",
+            };
+        }
+    };
+
+    const deleteProduct = async (productId) => {
+        try {
+            await deleteProductMutation(productId).unwrap();
+            toast.success({
+                title: "Success",
+                description: "Product deleted successfully",
+            });
+            await refetch();
+            return { success: true };
+        } catch (error) {
+            toast.error({
+                title: "Error",
+                description: error.data?.message || "Failed to delete product",
+            });
+            return {
+                success: false,
+                error: error.data?.message || "Failed to delete product",
+            };
+        }
+    };
+
+    return (
+        <UserProductsContext.Provider
+            value={{
+                products,
+                isLoading,
+                error,
+                addProduct,
+                updateProduct,
+                deleteProduct,
+                refreshProducts: refetch,
+            }}
+        >
+            {children}
+        </UserProductsContext.Provider>
+    );
 };
 
 export const useUserProducts = () => {
-  const context = useContext(UserProductsContext);
-  if (!context) {
-    throw new Error('useUserProducts must be used within a UserProductsProvider');
-  }
-  return context;
+    const context = useContext(UserProductsContext);
+    if (!context) {
+        throw new Error(
+            "useUserProducts must be used within a UserProductsProvider"
+        );
+    }
+    return context;
 };

@@ -18,7 +18,7 @@ import { TbCopyCheck } from "react-icons/tb";
 
 export default function Share({ url }) {
   const [textToCopy, setTextToCopy] = useState(
-    url || "https://cartloop.vercel.app/products"
+    url || "https://ecofinds.vercel.app/products"
   );
   const [copySuccess, setCopySuccess] = useState(false);
 

@@ -75,6 +75,27 @@ const Navbar = () => {
                         >
                             <Heart className="h-5 w-5" />
                         </Link>
+                        {isAuthenticated && (
+                            <Link
+                                to={"/orders"}
+                                className="text-gray-700 hover:text-amber-600 transition-colors duration-200"
+                                title="Order History"
+                            >
+                                <svg
+                                    className="h-5 w-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                    />
+                                </svg>
+                            </Link>
+                        )}
                         <Link
                             to={"/cart"}
                             className="relative text-gray-700 hover:text-amber-600 transition-colors duration-200 cursor-pointer"
@@ -89,16 +110,15 @@ const Navbar = () => {
                                     : 0}
                             </span>
                         </Link>
-                        {user &&
-                            isAuthenticated &&
-                            user.data.role == "vendor" && (
-                                <Link
-                                    to={"/vendor"}
-                                    className="relative text-gray-700 hover:text-amber-600 transition-colors duration-200 cursor-pointer"
-                                >
-                                    <RiAdminLine className="h-5.25 w-5.25" />
-                                </Link>
-                            )}
+                        {user && isAuthenticated && (
+                            <Link
+                                to={"/vendor"}
+                                className="relative text-gray-700 hover:text-amber-600 transition-colors duration-200 cursor-pointer"
+                                title="Vendor Dashboard"
+                            >
+                                <RiAdminLine className="h-5.25 w-5.25" />
+                            </Link>
+                        )}
 
                         {/* Mobile menu button */}
                         <button
@@ -148,6 +168,36 @@ const Navbar = () => {
                             >
                                 Contact
                             </Link>
+                            {user && isAuthenticated && (
+                                <>
+                                    <Link
+                                        to={"/orders"}
+                                        className="text-gray-700 hover:text-amber-600 transition-colors duration-200 font-medium flex items-center gap-2"
+                                    >
+                                        <svg
+                                            className="h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                            />
+                                        </svg>
+                                        Order History
+                                    </Link>
+                                    <Link
+                                        to={"/vendor"}
+                                        className="text-gray-700 hover:text-amber-600 transition-colors duration-200 font-medium flex items-center gap-2"
+                                    >
+                                        <RiAdminLine className="h-4 w-4" />
+                                        Vendor Dashboard
+                                    </Link>
+                                </>
+                            )}
                         </nav>
                     </div>
                 )}

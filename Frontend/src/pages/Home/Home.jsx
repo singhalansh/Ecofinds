@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import {
-  Menu,
-  X,
-  Search,
-  ShoppingCart,
-  User,
-  ArrowRight,
-  Star,
-  Truck,
-  Shield,
-  RefreshCw,
-  Heart,
-  ChevronLeft,
-  ChevronRight,
-  Play,
-  TrendingUp,
-  Award,
+    Menu,
+    X,
+    Search,
+    ShoppingCart,
+    User,
+    ArrowRight,
+    Star,
+    Truck,
+    Shield,
+    RefreshCw,
+    Heart,
+    ChevronLeft,
+    ChevronRight,
+    Play,
+    TrendingUp,
+    Award,
 } from "lucide-react";
 import Footer from "../../components/Home/Footer";
 import Newsletter from "../../components/Home/Newsletter";
@@ -28,36 +28,40 @@ import Navbar from "../../components/Home/Navbar";
 import { useSelector } from "react-redux";
 
 function Home() {
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
-  console.log("user : ", user);
-  console.log("isAuthenticated : ", isAuthenticated);
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <Navbar />
+    const authState = useSelector((state) => state.auth);
+    const { user, isAuthenticated } = authState || {
+        user: null,
+        isAuthenticated: false,
+    };
+    console.log("user : ", user);
+    console.log("isAuthenticated : ", isAuthenticated);
+    return (
+        <div className="min-h-screen bg-white">
+            {/* Header */}
+            <Navbar />
 
-      {/* Modern Hero Section */}
-      <Hero />
+            {/* Modern Hero Section */}
+            <Hero />
 
-      {/* Categories Section */}
-      <Category />
+            {/* Categories Section */}
+            <Category />
 
-      {/* Featured Products */}
-      <FeatureProducts />
+            {/* Featured Products */}
+            <FeatureProducts />
 
-      {/* Features Section */}
-      <FeatureSection />
+            {/* Features Section */}
+            <FeatureSection />
 
-      {/* Testimonials */}
-      <Testimonial />
+            {/* Testimonials */}
+            <Testimonial />
 
-      {/* Newsletter */}
-      <Newsletter />
+            {/* Newsletter */}
+            <Newsletter />
 
-      {/* Footer */}
-      <Footer />
-    </div>
-  );
+            {/* Footer */}
+            <Footer />
+        </div>
+    );
 }
 
 export default Home;

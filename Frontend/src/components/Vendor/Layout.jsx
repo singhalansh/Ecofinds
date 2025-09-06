@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BarChart3, Package, Plus, Store, Menu, X } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3 },
@@ -11,6 +12,17 @@ const sidebarItems = [
 
 const Layout = ({ children, currentView, onViewChange }) => {
     const [sidebarOpen, setSidebarOpen] = React.useState(false);
+    const { user } = useSelector((state) => state.auth);
+
+    const getUserInitials = (name) => {
+        if (!name) return "U";
+        return name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2);
+    };
 
     return (
         <div className="min-h-screen bg-background flex">
@@ -79,13 +91,15 @@ const Layout = ({ children, currentView, onViewChange }) => {
                         <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
                                 <span className="text-sm font-medium text-primary-foreground">
-                                    JD
+                                    {getUserInitials(user?.data?.name)}
                                 </span>
                             </div>
                             <div className="text-sm">
-                                <div className="font-medium">John Doe</div>
+                                <div className="font-medium">
+                                    {user?.data?.name || "User"}
+                                </div>
                                 <div className="text-muted-foreground">
-                                    Vendor
+                                    {user?.data?.role || "Vendor"}
                                 </div>
                             </div>
                         </div>

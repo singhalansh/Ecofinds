@@ -15,6 +15,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { Plus, X, Upload } from "lucide-react";
+import { useUserProducts } from "@/contexts/UserProductsContext";
 
 const categories = [
     "Electronics",
@@ -29,11 +30,17 @@ const categories = [
     "Other",
 ];
 
-const ProductForm = ({ isEdit = false, productData }) => {
+const statusOptions = [
+    { value: "draft", label: "Draft" },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+];
+
+const ProductForm = ({ isEdit = false }) => {
     const { toast } = toast();
     const navigate = useNavigate();
     const { id } = useParams();
-    const { addProduct, updateProduct } = useUserProducts();
+    const { products, addProduct, updateProduct } = useUserProducts();
 
     const [isLoading, setIsLoading] = useState(false);
     const [imagePreviews, setImagePreviews] = useState([]);
@@ -46,41 +53,42 @@ const ProductForm = ({ isEdit = false, productData }) => {
         watch,
     } = useForm({
         defaultValues: {
-            name: productData?.name || "",
-            description: productData?.description || "",
-            price: productData?.price || "",
-            category: productData?.category || "",
-            stock: productData?.stock || 0,
-            status: productData?.status || "draft",
-            images: [],
+            name: "",
+            description: "",
+            price: "",
+            category: "",
+            stock: 0,
+            status: "draft",
         },
     });
 
+    // If in edit mode, load the product data
     useEffect(() => {
-        if (isEdit && productData) {
-            // Set form values from productData
-            Object.keys(productData).forEach((key) => {
-                if (
-                    key !== "_id" &&
-                    key !== "__v" &&
-                    key !== "createdAt" &&
-                    key !== "updatedAt"
-                ) {
-                    setValue(key, productData[key]);
-                }
-            });
+        if (isEdit && id) {
+            const product = products.find((p) => p._id === id);
+            if (product) {
+                Object.keys(product).forEach((key) => {
+                    if (
+                        key !== "_id" &&
+                        key !== "__v" &&
+                        key !== "createdAt" &&
+                        key !== "updatedAt"
+                    ) {
+                        setValue(key, product[key]);
+                    }
+                });
 
-            // Set image previews if images exist
-            if (productData.images && productData.images.length > 0) {
-                setImagePreviews(
-                    productData.images.map((img) => ({
-                        url: img.url,
-                        name: img.public_id,
-                    }))
-                );
+                if (product.images && product.images.length > 0) {
+                    setImagePreviews(
+                        product.images.map((img) => ({
+                            url: img.url,
+                            name: img.public_id,
+                        }))
+                    );
+                }
             }
         }
-    }, [isEdit, productData, setValue]);
+    }, [isEdit, id, products, setValue]);
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
@@ -121,26 +129,21 @@ const ProductForm = ({ isEdit = false, productData }) => {
                 }
             });
 
-            let result;
-            if (isEdit) {
-                result = await updateProduct({ id, updates: formData });
+            if (isEdit && id) {
+                await updateProduct({ id, updates: formData });
+                toast({
+                    title: "Product updated successfully",
+                    description: "Your product has been updated.",
+                });
             } else {
-                result = await addProduct(formData);
+                await addProduct(formData);
+                toast({
+                    title: "Product created successfully",
+                    description: "Your product has been added.",
+                });
             }
 
-            if (result.success) {
-                toast({
-                    title: `Product ${
-                        isEdit ? "updated" : "created"
-                    } successfully`,
-                    description: `Your product has been ${
-                        isEdit ? "updated" : "added"
-                    }.`,
-                });
-                navigate("/dashboard/products");
-            } else {
-                throw new Error(result.error || "Something went wrong");
-            }
+            navigate("/dashboard/products");
         } catch (error) {
             toast({
                 title: "Error",
@@ -157,7 +160,9 @@ const ProductForm = ({ isEdit = false, productData }) => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Product Information</CardTitle>
+                        <CardTitle>
+                            {isEdit ? "Edit Product" : "Add New Product"}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -248,6 +253,37 @@ const ProductForm = ({ isEdit = false, productData }) => {
                                 {errors.stock && (
                                     <p className="text-sm text-red-500">
                                         {errors.stock.message}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="status">Status</Label>
+                                <Select
+                                    onValueChange={(value) =>
+                                        setValue("status", value, {
+                                            shouldValidate: true,
+                                        })
+                                    }
+                                    value={watch("status")}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {statusOptions.map((status) => (
+                                            <SelectItem
+                                                key={status.value}
+                                                value={status.value}
+                                            >
+                                                {status.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.status && (
+                                    <p className="text-sm text-red-500">
+                                        {errors.status.message}
                                     </p>
                                 )}
                             </div>
