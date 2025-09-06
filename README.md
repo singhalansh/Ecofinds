@@ -4,11 +4,6 @@ ecofinds is a high-performance, scalable, and secure e-commerce web application 
 
 ---
 
-### 🔗 Demo Link
-
-Checkout the live demo of ecofinds:
-
-👉 [https://ecofinds.vercel.app](https://ecofinds.vercel.app)
 
 ---
 
