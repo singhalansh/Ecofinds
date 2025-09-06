@@ -6,11 +6,13 @@ import {
   Trash2,
   Check,
   Smartphone,
+  IndianRupee,
 } from "lucide-react";
 import { useEcommerce } from "../../contexts/EcommerceContext";
+import RazorpayPayment from "../Payment/RazorpayPayment";
 
 
-const PaymentPage = () => {
+const PaymentPage = ({ orderData, onPaymentSuccess, onPaymentError }) => {
   const {
     paymentMethods,
     addPaymentMethod,
@@ -18,7 +20,8 @@ const PaymentPage = () => {
     setDefaultPaymentMethod,
   } = useEcommerce();
   const [showForm, setShowForm] = useState(false);
-  const [selectedType, setSelectedType] = useState  ("credit");
+  const [selectedType, setSelectedType] = useState("credit");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("razorpay");
   const [formData, setFormData] = useState({
     cardNumber: "",
     expiryDate: "",
@@ -40,6 +43,13 @@ const PaymentPage = () => {
           formData.cardNumber
         )} ending in ${formData.cardNumber.slice(-4)}`,
         details: maskedCard,
+        isDefault: paymentMethods.length === 0,
+      };
+    } else if (selectedType === "razorpay") {
+      newMethod = {
+        type: "razorpay",
+        name: "Razorpay",
+        details: "Cards, UPI, Net Banking, Wallets",
         isDefault: paymentMethods.length === 0,
       };
     } else if (selectedType === "paypal") {
@@ -88,6 +98,8 @@ const PaymentPage = () => {
     switch (type) {
       case "credit":
         return <CreditCard className="w-6 h-6" />;
+      case "razorpay":
+        return <IndianRupee className="w-6 h-6" />;
       case "paypal":
         return (
           <div className="w-6 h-6 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold">
@@ -120,19 +132,108 @@ const PaymentPage = () => {
         </button>
       </div>
 
+      {/* Payment Method Selection */}
+      {orderData && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-6">Choose Payment Method</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {[
+              {
+                id: "razorpay",
+                name: "Razorpay",
+                description: "Cards, UPI, Net Banking, Wallets",
+                icon: <IndianRupee className="w-6 h-6" />,
+                color: "border-blue-500 bg-blue-50 text-blue-600",
+              },
+              {
+                id: "cod",
+                name: "Cash on Delivery",
+                description: "Pay when your order arrives",
+                icon: <CreditCard className="w-6 h-6" />,
+                color: "border-gray-200 hover:border-gray-300",
+              },
+              {
+                id: "stripe",
+                name: "Stripe",
+                description: "International cards accepted",
+                icon: <CreditCard className="w-6 h-6" />,
+                color: "border-gray-200 hover:border-gray-300",
+              },
+            ].map((method) => (
+              <button
+                key={method.id}
+                onClick={() => setSelectedPaymentMethod(method.id)}
+                className={`p-4 border-2 rounded-lg flex flex-col items-center space-y-2 transition-colors cursor-pointer ${
+                  selectedPaymentMethod === method.id
+                    ? method.color
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                {method.icon}
+                <span className="font-medium">{method.name}</span>
+                <span className="text-sm text-gray-500 text-center">{method.description}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Payment Processing */}
+          {selectedPaymentMethod === "razorpay" && (
+            <RazorpayPayment
+              orderData={orderData}
+              onPaymentSuccess={onPaymentSuccess}
+              onPaymentError={onPaymentError}
+            />
+          )}
+
+          {selectedPaymentMethod === "cod" && (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">
+                You will pay when your order arrives at your doorstep.
+              </p>
+              <button
+                onClick={() => onPaymentSuccess && onPaymentSuccess({ paymentMethod: 'cod' })}
+                className="bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+              >
+                Place Order (COD)
+              </button>
+            </div>
+          )}
+
+          {selectedPaymentMethod === "stripe" && (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">
+                You will be redirected to Stripe for secure payment processing.
+              </p>
+              <button
+                onClick={() => onPaymentSuccess && onPaymentSuccess({ paymentMethod: 'stripe' })}
+                className="bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+              >
+                Pay with Stripe
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {showForm && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-6">
             Add Payment Method
           </h2>
 
-          <div className="mb-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {[
                 {
                   type: "credit",
                   label: "Credit Card",
                   icon: <CreditCard className="w-6 h-6" />,
+                },
+                {
+                  type: "razorpay",
+                  label: "Razorpay",
+                  icon: <IndianRupee className="w-6 h-6" />,
                 },
                 {
                   type: "paypal",
@@ -268,6 +369,17 @@ const PaymentPage = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
+              </div>
+            )}
+
+            {selectedType === "razorpay" && (
+              <div className="text-center py-8">
+                <p className="text-gray-600 mb-4">
+                  Razorpay supports multiple payment methods including cards, UPI, net banking, and digital wallets.
+                </p>
+                <p className="text-sm text-gray-500">
+                  You'll be redirected to Razorpay's secure payment gateway to complete your transaction.
+                </p>
               </div>
             )}
 
