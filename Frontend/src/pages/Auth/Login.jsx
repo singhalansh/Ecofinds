@@ -15,7 +15,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../store/api/authApi";
 import { useRef } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 
 function cn(...inputs) {
     return twMerge(clsx(inputs));
@@ -180,7 +179,6 @@ const Logo = (props) => (
 
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
-    const { login } = useAuth();
     const [loginUser, { isLoading, error }] = useLoginUserMutation();
     const emailElement = useRef();
     const passwordElement = useRef();
@@ -197,22 +195,10 @@ export default function LoginPage() {
             });
             
             if (response.data) {
-                // Call login from AuthContext
-                await login({
-                    email: emailElement.current.value,
-                    name: response.data.user?.name || 'User',
-                });
-                
-                // Store the token if available
-                if (response.data.token) {
-                    localStorage.setItem('token', response.data.token);
-                }
-                
                 navigate(from, { replace: true });
             }
         } catch (err) {
-            console.error('Login failed:', err);
-            // Error handling is already done by the RTK Query hook
+            console.log(err);
         }
     };
 
@@ -290,7 +276,7 @@ export default function LoginPage() {
                                         name="password-login-05"
                                         autoComplete="password-login-05"
                                         placeholder="password@123"
-                                        required="true"
+                                        required={true}
                                         ref={passwordElement}
                                     />
                                     <span

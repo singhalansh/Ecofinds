@@ -132,18 +132,10 @@ userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.generateRefreshToken = async function () {
-    return await jwt.sign(
-        {
-            _id: this._id,
-            email: this.email,
-            role: this.role,
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-        }
-    );
+userSchema.methods.getSignedJwtToken = async function () {
+    return await jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE,
+    });
 };
 
 userSchema.methods.getResetPassword = async function () {

@@ -16,7 +16,7 @@ function checkAuthenticated() {
         try {
             const payload = await jwt.verify(
                 tokenValue,
-                process.env.REFRESH_TOKEN_SECRET
+                process.env.JWT_SECRET
             );
 
             if (!payload) {
@@ -33,7 +33,7 @@ function checkAuthenticated() {
         } catch (error) {
             logger.error("Something went wrong while authentication : ", error);
             return res.status(500).json({
-                success: true,
+                success: false,
                 message: "Something went wrong..",
             });
         }

@@ -55,7 +55,7 @@ const loginUser = catchAsyncErrors(async (req, res) => {
         });
     }
 
-    const token = await user.generateRefreshToken();
+    const token = await user.getSignedJwtToken();
 
     if (!token) {
         logger.warn("Token creation failed");
