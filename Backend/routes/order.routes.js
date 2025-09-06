@@ -6,6 +6,8 @@ import {
     getAllOrders,
     updateOrderStatus,
     deleteOrder,
+    razorpayWebhook,
+    verifyRazorpayPayment,
 } from "../controllers/order.controller.js";
 import { checkAuthenticated } from "../middlewares/authentication.js";
 
@@ -22,5 +24,9 @@ router.route("/orders").get(getAllOrders);
 router.route("/order/update/:id").put(updateOrderStatus);
 
 router.route("/order/delete/:id").delete(deleteOrder);
+
+// Razorpay routes
+router.route("/razorpay/webhook").post(razorpayWebhook);
+router.route("/razorpay/verify").post(checkAuthenticated(), verifyRazorpayPayment);
 
 export default router;

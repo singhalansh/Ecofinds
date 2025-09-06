@@ -22,6 +22,8 @@ const DB_connect = async () => {
         );
     } catch (error) {
         logger.error("MongoDB connection failed due to some error :", error);
+        logger.warn("App will continue without database connection");
+        // Don't throw the error, just log it
     }
 };
 

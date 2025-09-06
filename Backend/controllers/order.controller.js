@@ -5,6 +5,7 @@ import crypto from "crypto";
 import Stripe from "stripe";
 import logger from "../utils/logger.js";
 import dotenv from "dotenv";
+import razorpay from "../config/razorpay.js";
 
 // Load environment variables
 dotenv.config({
@@ -177,6 +178,84 @@ const createNewOrder = catchAsyncErrors(async (req, res) => {
             data: order,
             sessionUrl: session.url, // Return the Stripe session URL
         });
+    } else if (paymentMethod === "razorpay") {
+        // Create order with Razorpay payment
+        let paymentInfo = {
+            id: "razorpay",
+            status: "pending",
+        };
+
+        const order = await Order.create({
+            shippingInfo,
+            orderItems,
+            user: userId,
+            paymentMethod,
+            itemsPrice,
+            taxPrice,
+            shippingPrice,
+            totalPrice,
+            paymentInfo,
+        });
+
+        // Ensure order is created before proceeding
+        if (!order) {
+            logger.error("Error creating order with Razorpay payment");
+            return res.status(500).json({
+                success: false,
+                message: "Error creating order",
+            });
+        }
+
+        // Populate order items with product details
+        const PopulatedOrder = await Order.findById(order._id).populate(
+            "orderItems.product"
+        );
+
+        if (!PopulatedOrder) {
+            logger.error("Order not found");
+            return res.status(404).json({
+                success: false,
+                message: "Order not found",
+            });
+        }
+
+        // Create Razorpay order
+        const razorpayOrder = await razorpay.orders.create({
+            amount: Math.round(totalPrice * 100), // Amount in paisa
+            currency: "INR",
+            receipt: `order_${order._id}`,
+            notes: {
+                orderId: order._id.toString(),
+                userId: order.user.toString(),
+            },
+        });
+
+        if (!razorpayOrder) {
+            logger.error("Error creating Razorpay order");
+            return res.status(400).json({
+                success: false,
+                message: "Error while creating Razorpay order",
+            });
+        }
+
+        // Update the order with Razorpay order ID
+        order.paymentInfo.id = razorpayOrder.id;
+        order.paymentInfo.status = "pending";
+        await order.save();
+
+        logger.info(`Order created successfully with ID (Razorpay): ${order._id}`);
+
+        return res.status(201).json({
+            success: true,
+            message: "Order placed successfully",
+            data: order,
+            razorpayOrder: {
+                id: razorpayOrder.id,
+                amount: razorpayOrder.amount,
+                currency: razorpayOrder.currency,
+                key: process.env.RAZORPAY_KEY_ID,
+            },
+        });
     }
 });
 
@@ -238,6 +317,111 @@ const stripeWebhook = catchAsyncErrors(async (req, res) => {
         }
     }
     res.status(200).send();
+});
+
+// Razorpay webhook handler
+const razorpayWebhook = catchAsyncErrors(async (req, res) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        logger.error("Missing Razorpay webhook parameters");
+        return res.status(400).json({ message: "Invalid webhook data" });
+    }
+
+    try {
+        // Verify the webhook signature
+        const body = JSON.stringify(req.body);
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET)
+            .update(body)
+            .digest("hex");
+
+        if (expectedSignature !== razorpay_signature) {
+            logger.error("Invalid Razorpay webhook signature");
+            return res.status(400).json({ message: "Invalid signature" });
+        }
+
+        // Find the order
+        const order = await Order.findOne({ "paymentInfo.id": razorpay_order_id });
+
+        if (!order) {
+            logger.error("Order not found for Razorpay order ID:", razorpay_order_id);
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        // Update order payment status
+        order.paymentInfo.status = "completed";
+        order.paymentInfo.id = razorpay_payment_id; // Update with actual payment ID
+        order.paidAt = Date.now();
+
+        await order.save();
+
+        logger.info(`Razorpay payment completed for order: ${order._id}`);
+
+        return res.status(200).json({ message: "Payment verified successfully" });
+    } catch (error) {
+        logger.error("Razorpay webhook error:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+// Verify Razorpay payment
+const verifyRazorpayPayment = catchAsyncErrors(async (req, res) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return res.status(400).json({
+            success: false,
+            message: "Missing payment verification data",
+        });
+    }
+
+    try {
+        // Verify the signature
+        const body = razorpay_order_id + "|" + razorpay_payment_id;
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+            .update(body)
+            .digest("hex");
+
+        if (expectedSignature !== razorpay_signature) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid payment signature",
+            });
+        }
+
+        // Find and update the order
+        const order = await Order.findOne({ "paymentInfo.id": razorpay_order_id });
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found",
+            });
+        }
+
+        // Update order payment status
+        order.paymentInfo.status = "completed";
+        order.paymentInfo.id = razorpay_payment_id;
+        order.paidAt = Date.now();
+
+        await order.save();
+
+        logger.info(`Razorpay payment verified for order: ${order._id}`);
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment verified successfully",
+            data: order,
+        });
+    } catch (error) {
+        logger.error("Razorpay payment verification error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Payment verification failed",
+        });
+    }
 });
 
 // get single order details -- ADMIN
@@ -359,4 +543,6 @@ export {
     getAllOrders,
     updateOrderStatus,
     deleteOrder,
+    razorpayWebhook,
+    verifyRazorpayPayment,
 };
