@@ -102,8 +102,8 @@ const Navbar = () => {
                         >
                             <ShoppingCart className="h-5 w-5" />
                             <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                                {user
-                                    ? user.data.cart.length
+                                {user && user.cart
+                                    ? user.cart.length
                                     : localStorage.getItem("cart")
                                     ? JSON.parse(localStorage.getItem("cart"))
                                           .length

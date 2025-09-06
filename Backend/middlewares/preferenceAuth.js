@@ -9,7 +9,7 @@ function preferenceAuth() {
 
         if (!tokenValue) {
             logger.error("Token not found");
-            next();
+            return next();
         }
         try {
             const payload = await jwt.verify(

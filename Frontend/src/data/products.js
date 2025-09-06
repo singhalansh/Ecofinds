@@ -7,9 +7,9 @@ export const products = [
     price: 299.99,
     originalPrice: 399.99,
     image: [
-      "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500",
+      "https://images.pexels.com/photos/15694644/pexels-photo-15694644.jpeg",
     ],
-    category: "Electronics",
+    category: "Plants",
     brand: "AudioTech",
     rating: 4.8,
     reviews: [],
@@ -25,7 +25,7 @@ export const products = [
     image: [
       "https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=500",
     ],
-    category: "Electronics",
+    category: "Herbs",
     brand: "FitTrack",
     rating: 4.6,
     reviews: [],
@@ -42,7 +42,7 @@ export const products = [
     image: [
       "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=500",
     ],
-    category: "Fashion",
+    category: "Flowers",
     brand: "LuxeBags",
     rating: 4.9,
     reviews: [],
@@ -58,7 +58,7 @@ export const products = [
     image: [
       "https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg?auto=compress&cs=tinysrgb&w=500",
     ],
-    category: "Electronics",
+    category: "Fertilizers",
     brand: "PhotoPro",
     rating: 4.7,
     reviews: [],

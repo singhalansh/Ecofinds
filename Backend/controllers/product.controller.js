@@ -152,7 +152,7 @@ const deleteProduct = catchAsyncErrors(async (req, res) => {
 });
 
 // Get Single Product
-// const getProductDetails = catchAsyncErrors(async (req, res) => {
+// const getProductDetails = catchAsyncErrors(async (req, res, next) => {
 //   console.log("Product details called here");
 //   const productId = req.params.id;
 //   const cacheKey = `product_${productId}`;
@@ -209,6 +209,7 @@ const getProductDetails = catchAsyncErrors(async (req, res) => {
         }
     } catch (err) {
         logger.error(`Redis GET failed: ${err.message}`);
+        // If redis fails, we proceed to fetch from DB, so we don't return here.
     }
 
     // Fetch product from DB and populate review names

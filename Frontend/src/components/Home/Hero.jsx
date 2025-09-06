@@ -34,7 +34,7 @@ const Hero = () => {
             <div className="space-y-4">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-transparent">
-                  Shop Smart,
+                  Shop Conscious,
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
@@ -104,14 +104,14 @@ const Hero = () => {
                 <div className="col-span-2 bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-all duration-500 ">
                   <div className="aspect-square bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl mb-6 overflow-hidden">
                     <img
-                      src="https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=800"
+                      src="https://images.pexels.com/photos/15694644/pexels-photo-15694644.jpeg"
                       alt="Featured Product"
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="text-center">
                     <h3 className="text-xl font-bold text-slate-900 mb-2">
-                      Wireless Earbuds Pro
+                      Bamboo Toothbrush
                     </h3>
                     <div className="flex items-center justify-center gap-2 mb-3">
                       <div className="flex">
@@ -142,13 +142,13 @@ const Hero = () => {
                 <div className="bg-white rounded-2xl shadow-lg p-4 transform hover:scale-105 transition-all duration-300">
                   <div className="aspect-square bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl mb-3 overflow-hidden">
                     <img
-                      src="https://images.pexels.com/photos/393047/pexels-photo-393047.jpeg?auto=compress&cs=tinysrgb&w=400"
+                      src="https://images.pexels.com/photos/3018819/pexels-photo-3018819.jpeg"
                       alt="Smart Watch"
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <h4 className="font-semibold text-slate-900 text-sm mb-1">
-                    Smart Watch
+                    Straw eco friendly
                   </h4>
                   <p className="text-amber-600 font-bold">₹249.99</p>
                 </div>
